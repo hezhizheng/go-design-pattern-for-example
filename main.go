@@ -9,15 +9,17 @@ import (
 
 func main() {
 	// 简单工厂调用
-	c := factory.GetFactoryInstance()
-	log.Println("单例 | 简单工厂模式调用", c.FactoryCreate("gitee","gitee token").Put(nil))
+	log.Println("单例 | 简单工厂模式调用")
+	instance := factory.GetFactoryInstance()
+	create := instance.FactoryCreate("gitee","gitee-token")
+	create.Put(nil)
 
 	// 策略模式调用
-	x := strategy.RepoStrategy(&github.GithubConstruct{
-		Token: "github token",
+	log.Println("策略模式调用")
+	repoStrategy := strategy.RepoStrategy(&github.GithubConstruct{
+		Token: "github-token",
 	})
+	service := *repoStrategy.Service
+	service.Put(nil)
 
-	q := *x.Service
-
-	log.Println("策略调用",q.Put(nil))
 }

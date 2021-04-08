@@ -17,11 +17,6 @@ type RepoAPI interface {
 var singleton *SingletonFactory
 var once sync.Once
 
-var serveMap = map[string]RepoAPI{
-	"gitee":  &gitee.GiteeConstruct{},
-	"github": &github.GithubConstruct{},
-}
-
 // GetInstance 用于获取单例模式对象，多协程的场景下不是线程安全的，使用 sync.Once 来实现
 func GetFactoryInstance() *SingletonFactory {
 	once.Do(func() {
