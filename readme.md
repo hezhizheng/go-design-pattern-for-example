@@ -71,7 +71,7 @@ class Github
 // 定义工厂类
 class Facotry
 {
-    public function create($type,$token){
+    public static function create($type,$token){
         switch ($type)
         {
         case "github":
@@ -84,7 +84,7 @@ class Facotry
     }
 }
 // 2、 controller 层调用, 这样在替换服务的时候我们只需要修改入参就好了
-$serve = (new Facotry)->create("github","token");
+$serve = Facotry::create("github","token");
 $serve->put([...]);
 ```
 如果新增其他服务的话，直接在工厂类中实现对应的类型就好了。
@@ -94,12 +94,13 @@ $serve->put([...]);
 // 定义工厂类
 class Facotry
 {
-    private $map = [
-    "github" => 'Github',
-    "gitee" => 'Gitee'
-];
-    public function create($type,$token){
-        return new $this->map[$type]($token);
+    private static $map = [
+        "github" => 'Github',
+        "gitee" => 'Gitee'
+    ];
+    
+    public static function create($type,$token){
+        return new self::$map[$type]($token);
     }
 }
 ```
@@ -109,26 +110,26 @@ class Facotry
 class Facotry
 {
     private static $singleton = null;
-    private  $map = [
-    "github" => 'Github',
-    "gitee" => 'Gitee'
-];
+    private static $map = [
+        "github" => 'Github',
+        "gitee" => 'Gitee'
+    ];
 
-     public static function singleton()
+    public static function singleton($platform, $token)
     {
         if ( self::$singleton === null )
         {
-            self::$singleton = new self();
+            self::$singleton = new self::$map[$platform]($token);
         }
         return self::$singleton;
-    }
+     }
     
-    public function create($type,$token){
-        return new $this->map[$type]($token);
+    public static function create($type,$token){
+        return new self::$map[$type]($token);
     }
 }
 // 单例调用
-Facotry::singleton()->create('github','token');
+Facotry::singleton('github','token');
 ```
 这样就实现了单例，避免我们在重复调用静态方法造成对资源的消耗
 
